@@ -1,0 +1,2 @@
+---
+bootstrap_zsh_user: "{{ ansible_env.USER | default(ansible_user_id) }}"

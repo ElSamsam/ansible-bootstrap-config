@@ -1,0 +1,44 @@
+---
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - openssh-server
+      - sudo
+      - vim
+      - zsh
+      - git
+      - curl
+    state: present
+    update_cache: true
+
+- name: Start SSH service
+  ansible.builtin.service:
+    name: ssh
+    state: started
+    enabled: true
+
+- name: Change user shell to zsh
+  ansible.builtin.user:
+    name: "{{ bootstrap_zsh_user }}"
+    shell: /bin/zsh
+  become: true
+
+- name: Install oh-my-zsh
+  ansible.builtin.shell: |
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
+  args:
+    creates: ~/.oh-my-zsh
+
+- name: Check if oh-my-zsh directory exists
+  ansible.builtin.stat:
+    path: ~/.oh-my-zsh
+  register: bootstrap_ohmyzsh_dir
+  become: false
+
+- name: Make sure oh-my-zsh is installed
+  ansible.builtin.assert:
+    that:
+      - bootstrap_ohmyzsh_dir.stat.exists
+      - bootstrap_ohmyzsh_dir.stat.isdir
+    fail_msg: "oh-my-zsh did not install correctly :/"
+    success_msg: "!! oh-my-zsh is installed !!"

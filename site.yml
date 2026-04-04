@@ -1,0 +1,7 @@
+---
+- name: Debian 13 Workstation Setup
+  hosts: debianvm
+  become: true
+  roles:
+    - bootstrap
+    - vscode
