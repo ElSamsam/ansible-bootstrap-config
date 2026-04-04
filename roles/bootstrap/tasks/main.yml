@@ -4,10 +4,11 @@
     name:
       - openssh-server
       - sudo
-      - vim
       - zsh
-      - git
+      - vim
       - curl
+      - wget
+      - git
     state: present
     update_cache: true
 
@@ -17,28 +18,78 @@
     state: started
     enabled: true
 
-- name: Change user shell to zsh
-  ansible.builtin.user:
-    name: "{{ bootstrap_zsh_user }}"
-    shell: /bin/zsh
-  become: true
+- name: Define oh-my-zsh paths
+  ansible.builtin.set_fact:
+    bootstrap_ohmyzsh_home: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dav') }}"
+    bootstrap_ohmyzsh_dir: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dav') }}/.oh-my-zsh"
 
-- name: Install oh-my-zsh
-  ansible.builtin.shell: |
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
-  args:
-    creates: ~/.oh-my-zsh
+################### DEBUG TASK
+# - name: Debug user paths
+#   ansible.builtin.debug:
+#     msg:
+#       - "ansible_user={{ ansible_user | default('undefined') }}"
+#       - "ansible_env.HOME={{ ansible_env.HOME | default('undefined') }}"
+#       - "ansible_user_dir={{ ansible_user_dir | default('undefined') }}"
+#       - "bootstrap_ohmyzsh_dir={{ bootstrap_ohmyzsh_dir | default('undefined') }}"
+###################
 
-- name: Check if oh-my-zsh directory exists
-  ansible.builtin.stat:
-    path: ~/.oh-my-zsh
-  register: bootstrap_ohmyzsh_dir
+- name: Check whether oh-my-zsh is already installed
   become: false
+  ansible.builtin.stat:
+    path: "{{ bootstrap_ohmyzsh_dir }}"
+  register: bootstrap_ohmyzsh
 
-- name: Make sure oh-my-zsh is installed
+- name: Remove incomplete oh-my-zsh directory if it exists
+  become: false
+  ansible.builtin.file:
+    path: "{{ bootstrap_ohmyzsh_dir }}"
+    state: absent
+  when:
+    - bootstrap_ohmyzsh.stat.exists
+    - not bootstrap_ohmyzsh.stat.isdir or not bootstrap_ohmyzsh.stat.readable
+
+- name: Clone oh-my-zsh repository
+  become: false
+  ansible.builtin.git:
+    repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+    dest: "{{ bootstrap_ohmyzsh_dir }}"
+    version: master
+    single_branch: true
+    update: false
+  register: bootstrap_ohmyzsh_git
+
+- name: Check whether default .zshrc exists
+  become: false
+  ansible.builtin.stat:
+    path: "{{ bootstrap_ohmyzsh_home }}/.zshrc"
+  register: bootstrap_zshrc_stat
+
+- name: Install default .zshrc from template if missing
+  become: false
+  ansible.builtin.copy:
+    src: "{{ bootstrap_ohmyzsh_dir }}/templates/zshrc.zsh-template"
+    dest: "{{ bootstrap_ohmyzsh_home }}/.zshrc"
+    remote_src: true
+    force: false
+    mode: "0644"
+  when: not bootstrap_zshrc_stat.stat.exists
+
+- name: Set zsh as default shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    shell: /bin/zsh
+
+- name: Verify oh-my-zsh directory exists
+  become: false
+  ansible.builtin.stat:
+    path: "{{ bootstrap_ohmyzsh_dir }}"
+  register: bootstrap_ohmyzsh_dir_check
+
+- name: Prints wether oh-my-zsh installation is valid
   ansible.builtin.assert:
     that:
-      - bootstrap_ohmyzsh_dir.stat.exists
-      - bootstrap_ohmyzsh_dir.stat.isdir
+      - bootstrap_ohmyzsh_dir_check.stat.exists
+      - bootstrap_ohmyzsh_dir_check.stat.isdir
     fail_msg: "oh-my-zsh did not install correctly :/"
-    success_msg: "!! oh-my-zsh is installed !!"
+    success_msg: "oh-my-zsh is installed"

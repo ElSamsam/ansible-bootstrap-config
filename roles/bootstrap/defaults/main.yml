@@ -1,2 +1,4 @@
 ---
-bootstrap_zsh_user: "{{ ansible_env.USER | default(ansible_user_id) }}"
+bootstrap_zsh_user: "{{ ansible_fact.USER | default(ansible_user_id) }}"
+bootstrap_ohmyzsh_home: "{{ ansible_user_dir }}"
+bootstrap_ohmyzsh_dir: "{{ ansible_user_dir }}/.oh-my-zsh"
