@@ -20,10 +20,10 @@
 
 - name: Define oh-my-zsh paths
   ansible.builtin.set_fact:
-    bootstrap_ohmyzsh_home: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dav') }}"
-    bootstrap_ohmyzsh_dir: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dav') }}/.oh-my-zsh"
+    bootstrap_ohmyzsh_home: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dave') }}"
+    bootstrap_ohmyzsh_dir: "{{ lookup('env', 'BOOTSTRAP_TARGET_USER') | default('dave') }}/.oh-my-zsh"
 
-################### DEBUG TASK
+################## DEBUG TASK
 # - name: Debug user paths
 #   ansible.builtin.debug:
 #     msg:
@@ -31,7 +31,7 @@
 #       - "ansible_env.HOME={{ ansible_env.HOME | default('undefined') }}"
 #       - "ansible_user_dir={{ ansible_user_dir | default('undefined') }}"
 #       - "bootstrap_ohmyzsh_dir={{ bootstrap_ohmyzsh_dir | default('undefined') }}"
-###################
+##################
 
 - name: Check whether oh-my-zsh is already installed
   become: false

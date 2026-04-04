@@ -1,5 +1,14 @@
 ---
-- name: Install VS Code from deb and cleanup
+- name: Check if VS Code is already installed
+  ansible.builtin.command: which code
+  register: vscode_check
+  changed_when: false
+  failed_when: false
+
+# Ansible key order: name -> when -> block -> always
+
+- name: Install VS Code
+  when: vscode_check.rc != 0 # checks if vs code is installed before doing anything
   block:
     - name: Download VS Code .deb
       ansible.builtin.get_url:

@@ -1,0 +1,16 @@
+---
+- name: Export .zshrc to ansible_user
+  ansible.builtin.copy:
+    src: ~/.zshrc
+    dest: /home/dave/.zshrc
+    owner: dave
+    group: dave
+    mode: '0644'
+
+- name: Export pretty markdown
+  ansible.builtin.copy:
+    src: /home/sam/dev/random/ansible/bootstrap/includes/flag.md
+    dest: /home/dave/README.md
+    owner: dave
+    group: dave
+    mode: '0644'

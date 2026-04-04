@@ -15,10 +15,14 @@ cat > run/inventory.ini << EOF
 debianvm ansible_host=$WINDOWS_HOST_IP ansible_port=2222 ansible_user=$TARGET_USER
 EOF
 
-# running project
+# run project
 printf "${green}Deploying...${reset}\n"
 ansible-playbook -i run/inventory.ini site.yml --ask-pass --ask-become-pass
 
 # did it work??
 printf "${yellow}Verifying deployment...${reset}\n"
-ssh -p 2222 "$TARGET_USER@$WINDOWS_HOST_IP" "code --version && printf '${magenta}VS Code is here!${reset}\n' || printf '${red}VS Code missing${reset}\n'"
+ssh -p 2222 "$TARGET_USER@$WINDOWS_HOST_IP" \
+	"code --version && \
+	printf '${magenta}VS Code is here!${reset}\n' || printf '${red}VS Code missing${reset}\n' && \
+	ls /home/$TARGET_USER/.zshrc && \
+	printf '${cyan}oh-my-zsh installed!${reset}\n' || printf '${red}oh-my-zsh missing${reset}\n'"
