@@ -2,6 +2,10 @@
 - name: Debian 13 Workstation Setup
   hosts: debianvm
   become: true
+  vars:
+    bootstrap_zsh_user: dave
+    bootstrap_ohmyzsh_home: "/home/dave/"
+    bootstrap_ohmyzsh_dir: "/home/dave/.oh_my_zsh"
   roles:
     - bootstrap
     - vscode

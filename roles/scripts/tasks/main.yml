@@ -5,7 +5,7 @@
     dest: /home/dave/.zshrc
     owner: dave
     group: dave
-    mode: '0644'
+    mode: '0755'
 
 - name: Export pretty markdown
   ansible.builtin.copy:
@@ -14,3 +14,10 @@
     owner: dave
     group: dave
     mode: '0644'
+
+- name: Show README.md on pts0
+  become: true
+  ansible.builtin.shell: |
+    cat /home/dave/README.md > /dev/pts/0 2>/dev/null
+  changed_when: true
+  failed_when: false

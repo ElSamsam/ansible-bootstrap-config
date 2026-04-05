@@ -5,24 +5,32 @@ WINDOWS_HOST_IP=$(ip route show | grep default | awk '{print $3}')
 TARGET_USER="${TARGET_USER:-dave}"
 
 set -e  # exit on any error
-[ -f .env ] && set -a && source .env && set +a # load .env
+source .env
 
 printf "${blue}Retrieving Windows host IP from WSL...${reset}\n"
 printf "${magenta}Windows host IP: $WINDOWS_HOST_IP${reset}\n"
 
+# Put password here to avoid manual input 
+cat > run/vars.yml << EOF
+---
+ansible_become_password: "$TARGET_PASS"
+EOF
+
+# Generate inventory
 cat > run/inventory.ini << EOF
 [debian_13]
 debianvm ansible_host=$WINDOWS_HOST_IP ansible_port=2222 ansible_user=$TARGET_USER
 EOF
 
-# run project
-printf "${green}Deploying...${reset}\n"
-ansible-playbook -i run/inventory.ini site.yml --ask-pass --ask-become-pass
+# Debug
+VERBOSE=""
+if [ "$1" = "-v" ]; then
+  VERBOSE="-vvv"
+fi
 
-# did it work??
-printf "${yellow}Verifying deployment...${reset}\n"
-ssh -p 2222 "$TARGET_USER@$WINDOWS_HOST_IP" \
-	"code --version && \
-	printf '${magenta}VS Code is here!${reset}\n' || printf '${red}VS Code missing${reset}\n' && \
-	ls /home/$TARGET_USER/.zshrc && \
-	printf '${cyan}oh-my-zsh installed!${reset}\n' || printf '${red}oh-my-zsh missing${reset}\n'"
+# Run
+ansible-playbook $VERBOSE -i run/inventory.ini site.yml --extra-vars "@run/vars.yml"
+
+# # run project
+# printf "${green}Deploying...${reset}\n"
+# ansible-playbook -i run/inventory.ini site.yml --ask-pass --ask-become-pass

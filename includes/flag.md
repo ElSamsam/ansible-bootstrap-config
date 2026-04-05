@@ -1,8 +1,10 @@
+
+
 ╭──────────────────────────────────────────────────────────╮
 │                 **DEPLOYMENT COMPLETE!**                 │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
-│  **Bootstrap Success!**				                   │
+│  **Bootstrap Success!**                                  │
 │                                                          │
 │  **Oh My Zsh** installed → `/home/dave/.oh-my-zsh`       │
 │  **VS Code** ready → `code .` works!                     │
