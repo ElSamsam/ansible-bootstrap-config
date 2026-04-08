@@ -1,0 +1,7 @@
+# TODO and IDEAS for next implementations:
+
+- Install Firefox/Chrome/Brave and import bookmarks
+- Connect to VS Code account or install extensions directly
+- Vaults and secret management (Ansible Vault solution ? HashiCorp Vault?)
+- Background picture?
+- Discord/Slack
