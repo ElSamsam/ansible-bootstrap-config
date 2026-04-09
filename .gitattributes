@@ -1,2 +1,12 @@
 *.sh linguist-language=Shell
 *.yml linguist-language=Ansible
+./roles/bootstrap/defaults/main.yml linguist-language=Ansible
+./roles/bootstrap/tasks/main.yml linguist-language=Ansible
+./roles/desktop/defaults/main.yml linguist-language=Ansible
+./roles/desktop/tasks/main.yml linguist-language=Ansible
+./roles/scripts/defaults/main.yml linguist-language=Ansible
+./roles/scripts/tasks/main.yml linguist-language=Ansible
+./roles/vscode/defaults/main.yml linguist-language=Ansible
+./roles/vscode/tasks/main.yml linguist-language=Ansible
+./site.yml linguist-language=Ansible
+
